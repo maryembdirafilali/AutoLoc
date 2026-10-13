@@ -4,9 +4,9 @@ import java.util.List;
 import tn.esprit.autoloc.domain.Contrat;
 
 public interface IContratService {
-    Contrat saveContrat(Contrat contrat);
-    Contrat updateContrat(Long id, Contrat contrat);
-    Contrat getContratById(Long id);
-    List<Contrat> getAllContrats();
-    void deleteContrat(Long id);
+    Contrat create(Contrat contrat);
+    Contrat findById(Long id);
+    List<Contrat> findAll();
+    Contrat update(Long id, Contrat contrat);
+    void deleteById(Long id);
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tn.esprit.autoloc.domain.Employe;
+import tn.esprit.autoloc.exception.ResourceNotFoundException;
 import tn.esprit.autoloc.repository.IEmployeRepository;
 import tn.esprit.autoloc.service.IEmployeService;
 
@@ -14,34 +15,51 @@ public class EmployeServiceImpl implements IEmployeService {
     private final IEmployeRepository employeRepository;
 
     @Override
-    public Employe saveEmploye(Employe employe) {
+    public Employe create(Employe employe) {
+        if (employe.getIdEmploye() != null) {
+            throw new IllegalArgumentException("Un nouvel employé ne doit pas avoir d'identifiant");
+        }
+        if (employe.getNom() == null || employe.getNom().trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom de l'employé est obligatoire");
+        }
+        if (employe.getRole() == null) {
+            throw new IllegalArgumentException("Le rôle/poste de l'employé est obligatoire");
+        }
         return employeRepository.save(employe);
     }
 
     @Override
-    public Employe updateEmploye(Long id, Employe employe) {
-        return employeRepository.findById(id).map(existingEmploye -> {
-            existingEmploye.setNom(employe.getNom());
-            existingEmploye.setPrenom(employe.getPrenom());
-            existingEmploye.setRole(employe.getRole());
-            existingEmploye.setAgence(employe.getAgence());
-            return employeRepository.save(existingEmploye);
-        }).orElseThrow(() -> new RuntimeException("Employe introuvable avec l'id : " + id));
-    }
-
-    @Override
-    public Employe getEmployeById(Long id) {
+    public Employe findById(Long id) {
         return employeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Employe introuvable avec l'id : " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Employe", id));
     }
 
     @Override
-    public List<Employe> getAllEmployes() {
+    public List<Employe> findAll() {
         return employeRepository.findAll();
     }
 
     @Override
-    public void deleteEmploye(Long id) {
+    public Employe update(Long id, Employe employe) {
+        Employe existant = findById(id);
+        if (employe.getNom() == null || employe.getNom().trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom de l'employé est obligatoire");
+        }
+        if (employe.getRole() == null) {
+            throw new IllegalArgumentException("Le rôle/poste de l'employé est obligatoire");
+        }
+        existant.setNom(employe.getNom());
+        existant.setPrenom(employe.getPrenom());
+        existant.setRole(employe.getRole());
+        existant.setAgence(employe.getAgence());
+        return employeRepository.save(existant);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        if (!employeRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Employe", id);
+        }
         employeRepository.deleteById(id);
     }
 }
