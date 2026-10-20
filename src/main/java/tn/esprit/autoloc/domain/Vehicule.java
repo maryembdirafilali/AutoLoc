@@ -1,5 +1,6 @@
 package tn.esprit.autoloc.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -47,10 +48,12 @@ public class Vehicule {
 
     @OneToMany(mappedBy = "vehicule")
     @Builder.Default
+    @JsonIgnore
     private List<Maintenance> maintenances = new ArrayList<>();
 
     @OneToMany(mappedBy = "vehicule")
     @Builder.Default
+    @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
 
     @ManyToMany

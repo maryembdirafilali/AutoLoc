@@ -23,6 +23,9 @@ public class ContratServiceImpl implements IContratService {
         if (contrat.getMontantTotal() != null && contrat.getMontantTotal().compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Le montant total d'un contrat ne peut pas être négatif");
         }
+        if (contrat.getPaiements() != null) {
+            contrat.getPaiements().forEach(p -> p.setContrat(contrat));
+        }
         return contratRepository.save(contrat);
     }
 

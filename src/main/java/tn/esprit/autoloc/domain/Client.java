@@ -1,5 +1,6 @@
 package tn.esprit.autoloc.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -35,5 +36,6 @@ public class Client {
 
     @OneToMany(mappedBy = "client")
     @Builder.Default
+    @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
 }

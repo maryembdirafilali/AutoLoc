@@ -1,5 +1,6 @@
 package tn.esprit.autoloc.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,9 +33,11 @@ public class Agence {
 
     @OneToMany(mappedBy = "agence")
     @Builder.Default
+    @JsonIgnore
     private List<Employe> employes = new ArrayList<>();
 
     @OneToMany(mappedBy = "agence")
     @Builder.Default
+    @JsonIgnore
     private List<Vehicule> vehicules = new ArrayList<>();
 }
