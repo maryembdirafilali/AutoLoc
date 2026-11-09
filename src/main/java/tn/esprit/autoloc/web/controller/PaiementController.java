@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tn.esprit.autoloc.domain.Paiement;
 import tn.esprit.autoloc.service.IPaiementService;
+import tn.esprit.autoloc.web.dto.PaiementDTO;
 
-@Tag(name = "Paiements", description = "Consultation des paiements (lecture seule)")
+@Tag(name = "Paiements", description = "Consultation des paiements (gestion via les contrats)")
 @RestController
 @RequestMapping("/paiements")
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public class PaiementController {
     @Operation(summary = "Lister tous les paiements")
     @ApiResponse(responseCode = "200", description = "Liste des paiements récupérée avec succès")
     @GetMapping
-    public List<Paiement> findAll() {
+    public List<PaiementDTO> findAll() {
         return paiementService.findAll();
     }
 
@@ -35,7 +35,7 @@ public class PaiementController {
         @ApiResponse(responseCode = "404", description = "Paiement introuvable")
     })
     @GetMapping("/{id}")
-    public Paiement findById(@Parameter(description = "Identifiant du paiement") @PathVariable Long id) {
+    public PaiementDTO findById(@Parameter(description = "Identifiant du paiement") @PathVariable Long id) {
         return paiementService.findById(id);
     }
 }

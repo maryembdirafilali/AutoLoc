@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import tn.esprit.autoloc.domain.Employe;
 import tn.esprit.autoloc.service.IEmployeService;
+import tn.esprit.autoloc.web.dto.EmployeDTO;
 
-@Tag(name = "Employes", description = "Gestion des employés")
+@Tag(name = "Employes", description = "Gestion des employés de l'entreprise")
 @RestController
 @RequestMapping("/employes")
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class EmployeController {
     @Operation(summary = "Lister tous les employés")
     @ApiResponse(responseCode = "200", description = "Liste des employés récupérée avec succès")
     @GetMapping
-    public List<Employe> findAll() {
+    public List<EmployeDTO> findAll() {
         return employeService.findAll();
     }
 
@@ -41,30 +42,32 @@ public class EmployeController {
         @ApiResponse(responseCode = "404", description = "Employé introuvable")
     })
     @GetMapping("/{id}")
-    public Employe findById(@Parameter(description = "Identifiant de l'employé") @PathVariable Long id) {
+    public EmployeDTO findById(@Parameter(description = "Identifiant de l'employé") @PathVariable Long id) {
         return employeService.findById(id);
     }
 
     @Operation(summary = "Créer un employé")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Employé créé avec succès"),
-        @ApiResponse(responseCode = "400", description = "Données invalides ou attributs obligatoires manquants")
+        @ApiResponse(responseCode = "400", description = "Données invalides ou attributs obligatoires manquants"),
+        @ApiResponse(responseCode = "404", description = "Agence introuvable")
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Employe create(@RequestBody Employe employe) {
-        return employeService.create(employe);
+    public EmployeDTO create(@Parameter(description = "Données de l'employé à créer") @Valid @RequestBody EmployeDTO employeDTO) {
+        return employeService.create(employeDTO);
     }
 
     @Operation(summary = "Modifier un employé")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Employé modifié avec succès"),
         @ApiResponse(responseCode = "400", description = "Données invalides"),
-        @ApiResponse(responseCode = "404", description = "Employé introuvable")
+        @ApiResponse(responseCode = "404", description = "Employé ou agence introuvable")
     })
     @PutMapping("/{id}")
-    public Employe update(@Parameter(description = "Identifiant de l'employé") @PathVariable Long id, @RequestBody Employe employe) {
-        return employeService.update(id, employe);
+    public EmployeDTO update(@Parameter(description = "Identifiant de l'employé") @PathVariable Long id,
+                             @Parameter(description = "Nouvelles données de l'employé") @Valid @RequestBody EmployeDTO employeDTO) {
+        return employeService.update(id, employeDTO);
     }
 
     @Operation(summary = "Supprimer un employé")
