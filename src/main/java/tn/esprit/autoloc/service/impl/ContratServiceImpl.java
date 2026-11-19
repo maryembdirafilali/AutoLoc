@@ -1,6 +1,8 @@
 package tn.esprit.autoloc.service.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -89,5 +91,36 @@ public class ContratServiceImpl implements IContratService {
             throw new ResourceNotFoundException("Contrat", id);
         }
         contratRepository.deleteById(id);
+    }
+
+    @Override
+    public ContratDTO affecterContratAReservation(LocalDate dateSignature, LocalDate dateDebut, LocalDate dateFin) {
+        Reservation reservation = reservationRepository.findFirstByDateDebutAndDateFin(dateDebut, dateFin)
+                .orElseThrow(() -> new ResourceNotFoundException("Reservation pour la période du " + dateDebut + " au " + dateFin + " introuvable"));
+
+        BigDecimal montantTotal = BigDecimal.ZERO;
+        if (reservation.getVehicule() != null && reservation.getVehicule().getTarifJournalier() != null) {
+            long jours = ChronoUnit.DAYS.between(dateDebut, dateFin);
+            if (jours <= 0) {
+                jours = 1;
+            }
+            montantTotal = reservation.getVehicule().getTarifJournalier().multiply(BigDecimal.valueOf(jours));
+        }
+
+        final BigDecimal finalMontant = montantTotal;
+        Contrat contrat = contratRepository.findFirstByDateSignature(dateSignature)
+                .orElseGet(() -> Contrat.builder()
+                        .dateSignature(dateSignature)
+                        .montantTotal(finalMontant)
+                        .valide(true)
+                        .build());
+
+        contrat.setReservation(reservation);
+        reservation.setContrat(contrat);
+
+        Contrat saved = contratRepository.save(contrat);
+        reservationRepository.save(reservation);
+
+        return contratMapper.toDto(saved);
     }
 }
